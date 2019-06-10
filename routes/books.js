@@ -10,7 +10,7 @@ router.get("/", function(req, res, next) {
       res.render("index", { books: books, title: "List Of Books" });
     })
     .catch(function(err) {
-      res.render("error", { error: err.message });
+      next({ status: 500, message: err.message });
     });
 });
 
@@ -19,7 +19,7 @@ router.get("/new", function(req, res, next) {
 });
 //Send a POST request to / to  CREATE a new book
 
-router.post("/", function(req, res, next) {
+router.post("/new", function(req, res, next) {
   Book.create(req.body)
     .then(function(book) {
       res.redirect("/books/" + book.id);
@@ -36,7 +36,7 @@ router.post("/", function(req, res, next) {
       }
     })
     .catch(err => {
-      res.render("error", { error: err.message });
+      next({ status: 500, message: err.message });
     });
 });
 
@@ -52,11 +52,11 @@ router.get("/:id", function(req, res, next) {
           year: book.year
         });
       } else {
-        res.render("book-not-found", { error: "This book is not available" });
+        next({ status: 400, message: "The book is not available" });
       }
     })
     .catch(err => {
-      res.render("error", { errors: err.message });
+      next({ status: 500, message: err.message });
     });
 });
 
@@ -66,7 +66,7 @@ router.post("/:id", function(req, res, next) {
       if (book) {
         return book.update(req.body);
       } else {
-        res.render("book-not-found", { error: "This book is not available" });
+        next({ status: 400, message: "The book is not available" });
       }
     })
     .then(function() {
@@ -89,7 +89,7 @@ router.post("/:id", function(req, res, next) {
       }
     })
     .catch(err => {
-      res.render("error", { error: err.message });
+      next({ status: 500, message: err.message });
     });
 });
 
@@ -99,14 +99,14 @@ router.post("/:id/delete", (req, res, next) => {
       if (book) {
         return book.destroy();
       } else {
-        res.render("book-not-found", { error: "This book is not available" });
+        next({ status: 400, message: "The book is not available" });
       }
     })
     .then(function(book) {
       res.redirect("/books");
     })
     .catch(err => {
-      res.render("error", { errors: err.message });
+      next({ status: 500, message: err.message });
     });
 });
 

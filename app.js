@@ -18,9 +18,33 @@ app.use("/", routes);
 app.use("/books", books);
 
 app.use((req, res, next) => {
-  const err = new Error("Page Not Found");
-  res.render("page-not-found", { error: err });
+  const err = new Error("Not Found");
+  err.status = 404;
+  next(err);
 });
+
+app.use((err, req, res, next) => {
+  if (err.status === 400) {
+    res.render("book-not-found", { error: err.message });
+  } else if (err.status === 500) {
+    res.render("error", { error: err.message });
+  } else {
+    res.render("page-not-found", { error: err });
+  }
+});
+
+// app.use((req, res, next) => {
+//   const err = new Error("Page Not Found");
+//   res.render("page-not-found", { error: err });
+// });
+
+// app.use((err, req, res, next) => {
+//   if (err.status === 404) {
+//     res.render("book-not-found", { error: "This book is not ailable" });
+//   } else {
+//     res.render("error", { error: err.message });
+//   }
+// });
 
 sequelize.sync().then(() => {
   app.listen(3000, () => console.log("Server is running on port 3000."));
